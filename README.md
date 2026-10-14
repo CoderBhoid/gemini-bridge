@@ -15,19 +15,19 @@
 
 Gemini Bridge connects local coding agents to active browser sessions on Google Gemini, ChatGPT, and Claude. It lets you use web interfaces directly from your terminal or IDE, executes local developer tools (`run_command`, `read_file`, `write_file`), and exposes a local OpenAI-compatible API on `http://localhost:8765/v1`.
 
-If you have an Android phone, you can also offload token pruning and destructive command checks to a local Termux microservice over ADB reverse.
+You can also use your Android phone as a **Pocket Server running Laya for System 1 models**. Laya runs on-device via Oorty to handle fast-path gating, safety checks, and token reducing before prompts ever reach your cloud webchat session.
 
 ---
 
 ## What It Does
 
-- **Works with any model selected in the web app**: You choose the model in the UI (like **Gemini 4 Pro Argon**, **GPT-6.1 Sol**, **GPT-6 Astra**, **Fable 5.5 / 5.1**, or **Claude 4 Opus**), and the bridge uses it dynamically.
+- **Works with any model selected in the web app**: You choose the model in the UI (like **Argon**, **GPT-6.1 Sol**, **GPT-6 Astra**, **Fable 5.5 / 5.1**, or **Claude Opus 5.5**), and the bridge uses it dynamically.
 - **Universal webchat support**: One Chrome extension works across `gemini.google.com`, `chatgpt.com`, and `claude.ai`.
 - **OpenAI-compatible server**: Drop `http://localhost:8765/v1` into Cursor, Antigravity, OpenClaude, Continue.dev, or the Python OpenAI SDK.
 - **Autonomous terminal loop**: Run commands and edits through the `gemini-bridge>` CLI with markdown tool blocks.
 - **Local tool runner**: Executes shell commands, reads file slices, and writes files safely on your local disk with output limits.
 - **Headless background daemon**: Run Chrome invisibly in RAM without an open browser window cluttering your desktop.
-- **Android Phone offload**: Connect an Android phone via USB to run token pruning and command safety checks in Termux.
+- **Android Pocket Server offload**: Turn your Android phone into a pocket server running Laya for fast-path System 1 token reduction and safety gating.
 
 ---
 
@@ -72,6 +72,22 @@ flowchart TD
 
 ## Quick Start
 
+### 🤖 One-Click Prompt for Coding Agents (Cursor / Antigravity / Claude Code)
+If you use an AI coding assistant, just paste this prompt and let the agent configure everything:
+
+> **Copy-paste this prompt into your agent:**
+> ```text
+> Set up Gemini Bridge as my local OpenAI-compatible provider:
+> 1. Clone https://github.com/CoderBhoid/gemini-bridge into my workspace and run `npm install`.
+> 2. Start the bridge via `npm start` (or `node cli.js`) on port 8765.
+> 3. Verify http://localhost:8765/v1/models is responding.
+> 4. Point this agent / workspace to base URL `http://localhost:8765/v1` with model 'argon' or 'gpt-6.1-sol'.
+> ```
+
+---
+
+### Manual Setup
+
 ### 1. Install Dependencies
 ```bash
 git clone https://github.com/CoderBhoid/gemini-bridge.git
@@ -102,7 +118,7 @@ If you want to keep your desktop clean without browser windows open:
    ```
    Chrome will run silently in the background, attach to the bridge, and process agent prompts.
 
-### 3. Connect Android Phone via Oorty (Laya System 1 Offload)
+### 3. Connect Android Phone via Oorty (Pocket Server Laya Offload)
 To prevent token exhaustion and stop webchat rate limits from dying early:
 1. Install **Oorty** on your Android phone and turn on the **Laya server** from inside Oorty (or in Termux via `node phone-bridge/phone_laya_server.js`).
 2. Connect your phone via USB and run:
@@ -133,7 +149,7 @@ Gemini Bridge exposes an OpenAI-compatible API at `http://localhost:8765/v1`.
 ### Cursor / Antigravity / Continue.dev
 - **Base URL**: `http://localhost:8765/v1`
 - **API Key**: Any placeholder (e.g. `sk-gemini-bridge`)
-- **Model**: `gemini-4-pro-argon`, `gpt-6.1-sol`, `gpt-6-astra`, `fable-5.5`, `fable-5.1`, `claude-4-opus`, `gemini-web`
+- **Model**: `argon`, `gpt-6.1-sol`, `gpt-6-astra`, `fable-5.5`, `fable-5.1`, `claude-opus-5-5`, `gemini-web`
 
 ### Python OpenAI Client
 ```python
@@ -145,7 +161,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="gemini-4-pro-argon",
+    model="argon",
     messages=[{"role": "user", "content": "Write a short bash script to check disk usage."}]
 )
 print(response.choices[0].message.content)
@@ -159,7 +175,7 @@ If you notice message limits ending quickly during long agent runs:
 
 1. **Understand Context Accumulation**: In webchat interfaces, each turn retains previous message history. A 10-turn conversation with large terminal outputs can send over 40,000 tokens on every turn.
 2. **Reset Threads for New Tasks**: Open a fresh chat session for a new task rather than letting one thread grow indefinitely.
-3. **Use Fast Models for Tool Execution**: Select lighter, fast models for repetitive terminal loops. Switch to **Gemini 4 Pro Argon**, **GPT-6.1 Sol**, or **Fable 5.5** when you need heavy architecture planning.
+3. **Use Fast Models for Tool Execution**: Select lighter, fast models for repetitive terminal loops. Switch to **Argon**, **GPT-6.1 Sol**, or **Fable 5.5** when you need heavy architecture planning.
 4. **Oorty Laya Offload**: Turning on the Laya server from Oorty on your phone automatically prunes verbose logs before they reach the webchat.
 
 ---

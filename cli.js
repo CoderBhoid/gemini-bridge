@@ -289,15 +289,14 @@ function start() {
           object: 'list',
           data: [
             { id: activeModel, object: 'model', created: now, owned_by: activePlatform.toLowerCase() },
-            { id: 'gemini-web', object: 'model', created: now, owned_by: 'google' },
-            { id: 'gemini-4-pro-argon', object: 'model', created: now, owned_by: 'google' },
+            { id: 'argon', object: 'model', created: now, owned_by: 'google' },
+            { id: 'gemini-4-argon', object: 'model', created: now, owned_by: 'google' },
             { id: 'gpt-6.1-sol', object: 'model', created: now, owned_by: 'openai' },
             { id: 'gpt-6-astra', object: 'model', created: now, owned_by: 'openai' },
             { id: 'fable-5.5', object: 'model', created: now, owned_by: 'anthropic' },
             { id: 'fable-5.1', object: 'model', created: now, owned_by: 'anthropic' },
-            { id: 'claude-4-opus', object: 'model', created: now, owned_by: 'anthropic' },
-            { id: 'claude-3-7-sonnet', object: 'model', created: now, owned_by: 'anthropic' },
-            { id: 'gemini-2.0-flash', object: 'model', created: now, owned_by: 'google' }
+            { id: 'claude-opus-5-5', object: 'model', created: now, owned_by: 'anthropic' },
+            { id: 'gemini-web', object: 'model', created: now, owned_by: 'google' }
           ]
         })
       );
