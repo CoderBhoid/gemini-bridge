@@ -24,6 +24,8 @@ USAGE:
 
 OPTIONS:
   -p, --port <number>   Port for WebSocket server and OpenAI HTTP proxy (default: 8765)
+  --safe                Enable humanized pacing and safety delays (default: enabled)
+  --fast                Disable safety pacing delays for faster execution
   -t, --test            Verify syntax, test configuration, and exit cleanly
   -h, --help            Show this help manual
 
@@ -39,6 +41,8 @@ if (args.includes('--test')) {
   console.log('\x1b[32m[Gemini Bridge Test]\x1b[0m Syntax and configuration valid.');
   process.exit(0);
 }
+
+const isSafeMode = !args.includes('--fast');
 
 let configuredPort = process.env.PORT || process.env.WS_PORT || 8765;
 const portArgIndex = args.findIndex((arg) => arg === '-p' || arg === '--port');
@@ -174,7 +178,7 @@ function sendPromptToChrome(promptText) {
       );
     }
     pendingResponseResolver = resolve;
-    activeSocket.send(JSON.stringify({ type: 'PROMPT', text: promptText }));
+    activeSocket.send(JSON.stringify({ type: 'PROMPT', text: promptText, safeMode: isSafeMode }));
   });
 }
 
@@ -228,6 +232,12 @@ async function runAgentLoop(userGoal) {
 
     promptToSend = `[Tool Result: ${toolCall.tool}]\n\`\`\`json\n${formattedOutput}\n\`\`\`\nPlease inspect this result and proceed with your next tool call or your final response.`;
     turn++;
+
+    // Safety pacing: 1500ms human reading pace pause before sending subsequent automated prompts
+    if (isSafeMode) {
+      console.log(`\x1b[90m[Safety Mode] Human reading pace pause (1500ms)...\x1b[0m`);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    }
   }
 
   if (turn > maxTurns) {
@@ -424,6 +434,9 @@ function start() {
     activeSocket = ws;
     console.log(`\n\x1b[32m[Bridge Connected]\x1b[0m Browser extension attached on ws://localhost:${WS_PORT}`);
 
+    // Send initial configuration to extension
+    ws.send(JSON.stringify({ type: 'CONFIG', safeMode: isSafeMode }));
+
     ws.on('message', (message) => {
       try {
         const data = JSON.parse(message);
@@ -453,6 +466,7 @@ function start() {
     console.log(`\x1b[35m=== Gemini Bridge Orchestrator & Universal Proxy ===\x1b[0m`);
     console.log(`HTTP/OpenAI API: http://localhost:${WS_PORT}/v1`);
     console.log(`WebSocket Bridge: ws://localhost:${WS_PORT}`);
+    console.log(`Safety Mode:     ${isSafeMode ? '\x1b[32mEnabled (1500ms pacing + humanized jitter)\x1b[0m' : '\x1b[33mDisabled (--fast active)\x1b[0m'}`);
     console.log(`Waiting for browser connection (Gemini / ChatGPT / Claude)...`);
   });
 

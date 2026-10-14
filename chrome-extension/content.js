@@ -8,6 +8,7 @@
   const WS_URL = 'ws://localhost:8765';
   let socket = null;
   let isGenerating = false;
+  let safeModeActive = true;
   const reconnectInterval = 2000;
   let lastReportedModel = '';
 
@@ -214,19 +215,89 @@
 
   function setStatus(status) {
     const activeModel = currentAdapter.getModelName();
+    const modeLabel = safeModeActive ? 'Safe Mode' : 'Fast Mode';
     if (status === 'connected' || status === 'ready') {
       dot.style.backgroundColor = '#10b981';
-      textLabel.textContent = `Agent Bridge: Ready [${platform}: ${activeModel}]`;
+      textLabel.textContent = `Agent Bridge: Ready [${platform}: ${activeModel} | ${modeLabel}]`;
     } else if (status === 'busy') {
       dot.style.backgroundColor = '#f59e0b';
-      textLabel.textContent = `Agent Bridge: Busy [${platform}: ${activeModel}]`;
+      textLabel.textContent = `Agent Bridge: Busy [${platform}: ${activeModel} | ${modeLabel}]`;
     } else {
       dot.style.backgroundColor = '#ef4444';
       textLabel.textContent = 'Agent Bridge: Disconnected';
     }
   }
 
-  // 4. Prompt Injection and Submission
+  // 4. Human-like Simulated Pointer Events
+  function simulateHumanClick(element) {
+    if (!element) return false;
+
+    const rect = element.getBoundingClientRect();
+    const offsetX = rect.width * (0.35 + Math.random() * 0.3);
+    const offsetY = rect.height * (0.35 + Math.random() * 0.3);
+    const clientX = Math.round(rect.left + offsetX);
+    const clientY = Math.round(rect.top + offsetY);
+    const screenX = Math.round(window.screenX + clientX);
+    const screenY = Math.round(window.screenY + clientY);
+
+    const baseEventInit = {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      view: window,
+      detail: 1,
+      clientX,
+      clientY,
+      screenX,
+      screenY,
+      button: 0
+    };
+
+    const downInit = {
+      ...baseEventInit,
+      buttons: 1
+    };
+
+    const upInit = {
+      ...baseEventInit,
+      buttons: 0
+    };
+
+    const pointerDownInit = {
+      ...downInit,
+      pointerId: 1,
+      pointerType: 'mouse',
+      isPrimary: true,
+      width: 1,
+      height: 1,
+      pressure: 0.5
+    };
+
+    const pointerUpInit = {
+      ...upInit,
+      pointerId: 1,
+      pointerType: 'mouse',
+      isPrimary: true,
+      width: 1,
+      height: 1,
+      pressure: 0
+    };
+
+    if (typeof PointerEvent === 'function') {
+      element.dispatchEvent(new PointerEvent('pointerdown', pointerDownInit));
+    }
+    element.dispatchEvent(new MouseEvent('mousedown', downInit));
+
+    if (typeof PointerEvent === 'function') {
+      element.dispatchEvent(new PointerEvent('pointerup', pointerUpInit));
+    }
+    element.dispatchEvent(new MouseEvent('mouseup', upInit));
+    element.dispatchEvent(new MouseEvent('click', upInit));
+
+    return true;
+  }
+
+  // 5. Prompt Injection and Submission
   function injectPrompt(text) {
     const input = currentAdapter.findInputBox();
     if (!input) {
@@ -235,6 +306,8 @@
     }
 
     input.focus();
+    input.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    input.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
 
     if (input.tagName.toLowerCase() === 'textarea') {
       input.value = text;
@@ -260,29 +333,51 @@
 
   function submitPrompt() {
     const sendBtn = currentAdapter.findSendButton();
-    if (sendBtn && !sendBtn.disabled) {
-      sendBtn.click();
+    if (sendBtn && !sendBtn.disabled && sendBtn.getAttribute('aria-disabled') !== 'true') {
+      simulateHumanClick(sendBtn);
       return true;
     }
 
     const input = currentAdapter.findInputBox();
     if (input) {
-      const enterEvent = new KeyboardEvent('keydown', {
+      input.focus();
+      const enterDown = new KeyboardEvent('keydown', {
         key: 'Enter',
         code: 'Enter',
         keyCode: 13,
         which: 13,
         bubbles: true,
-        cancelable: true
+        cancelable: true,
+        composed: true
       });
-      input.dispatchEvent(enterEvent);
+      const enterPress = new KeyboardEvent('keypress', {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true,
+        cancelable: true,
+        composed: true
+      });
+      const enterUp = new KeyboardEvent('keyup', {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true,
+        cancelable: true,
+        composed: true
+      });
+      input.dispatchEvent(enterDown);
+      input.dispatchEvent(enterPress);
+      input.dispatchEvent(enterUp);
       return true;
     }
 
     return false;
   }
 
-  // 5. Response Monitor
+  // 6. Response Monitor
   function monitorResponse(initialText) {
     return new Promise((resolve) => {
       let settledTimer = null;
@@ -326,7 +421,7 @@
     });
   }
 
-  // 6. WebSocket Lifecycle
+  // 7. WebSocket Lifecycle
   function connect() {
     try {
       socket = new WebSocket(WS_URL);
@@ -339,7 +434,7 @@
     socket.onopen = () => {
       const activeModel = currentAdapter.getModelName();
       lastReportedModel = activeModel;
-      console.log(`[Agent Bridge] Connected to CLI orchestrator on ${platform} (${activeModel})`);
+      console.log(`[Agent Bridge] Connected to CLI orchestrator on ${platform} (${activeModel}) [Safe Mode: ${safeModeActive}]`);
       setStatus('ready');
 
       socket.send(
@@ -347,6 +442,7 @@
           type: 'HELLO',
           platform,
           model: activeModel,
+          safeMode: safeModeActive,
           url: window.location.href
         })
       );
@@ -366,7 +462,20 @@
     socket.onmessage = async (event) => {
       try {
         const msg = JSON.parse(event.data);
+
+        if (msg.type === 'CONFIG') {
+          if (msg.safeMode !== undefined) {
+            safeModeActive = Boolean(msg.safeMode);
+          }
+          setStatus(isGenerating ? 'busy' : 'ready');
+          return;
+        }
+
         if (msg.type === 'PROMPT') {
+          if (msg.safeMode !== undefined) {
+            safeModeActive = Boolean(msg.safeMode);
+          }
+
           if (isGenerating) {
             socket.send(
               JSON.stringify({
@@ -395,6 +504,11 @@
             return;
           }
 
+          // Humanized jitter delay: between 1200ms and 2400ms in safe mode (never 0ms)
+          const delayMs = safeModeActive
+            ? Math.floor(1200 + Math.random() * 1200)
+            : 300;
+
           setTimeout(async () => {
             submitPrompt();
             const resultText = await monitorResponse(baselineText);
@@ -407,7 +521,7 @@
                 text: resultText
               })
             );
-          }, 400);
+          }, delayMs);
         }
       } catch (err) {
         console.error('[Agent Bridge] Message processing error:', err);
@@ -426,7 +540,8 @@
           JSON.stringify({
             type: 'STATUS',
             platform,
-            model: currentModel
+            model: currentModel,
+            safeMode: safeModeActive
           })
         );
       }

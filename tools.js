@@ -2,8 +2,8 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const MAX_OUTPUT_CHARS = 4000;
-const MAX_OUTPUT_LINES = 80;
+const MAX_OUTPUT_CHARS = 2000;
+const MAX_OUTPUT_LINES = 50;
 
 /**
  * Truncates text exceeding character or line thresholds while preserving context

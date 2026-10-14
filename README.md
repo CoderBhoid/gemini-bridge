@@ -19,6 +19,28 @@ You can also use your Android phone as a **Pocket Server running Laya for System
 
 ---
 
+## 🛡️ Visible Browser Tab Mode (Recommended for Account Safety)
+
+Running Gemini Bridge with a normal, visible Chrome tab is the **strongly recommended setup** for zero ban risk and complete peace of mind.
+
+### Why visible tab mode protects your account
+1. **Authentic browser session**: Uses your regular logged-in Google, OpenAI, or Anthropic account session with standard cookies and security tokens.
+2. **Real hardware fingerprint**: Runs with your genuine graphics card driver, authentic Canvas rendering, WebGL context, audio stack, and genuine screen resolution.
+3. **Legitimate extension runtime**: Executes as a standard Manifest V3 content script inside Chrome, indistinguishable from normal extension activity (like Grammarly or Vimium).
+4. **Zero automation flags**: Avoids all `navigator.webdriver` flags, automated testing attributes, and headless browser markers that anti-bot services (Cloudflare, reCAPTCHA Enterprise, Arkose) look for.
+
+### Why you should keep Chrome open
+For maximum safety, keep Chrome running with your webchat tab open. You do not need to actively watch it—it can sit on a secondary monitor or in a background workspace while you code. Keeping the window alive ensures the browser maintains active render frames and authentic user presence.
+
+### Built-in Human Safety Mode
+Safety Mode is enabled by default across both the CLI orchestrator and Chrome extension:
+- **Randomized paste jitter**: Waits a random delay between 1200ms and 2400ms before sending text to the chat input (never 0ms instant submissions).
+- **Simulated pointer events**: Dispatches full `pointerdown`, `mousedown`, `pointerup`, `mouseup`, and `click` sequences with simulated client coordinates instead of raw programmatic clicks.
+- **Reading pace pause**: Enforces a 1500ms human reading pace pause before sending subsequent automated tool prompts.
+- **Token flood protection**: Restricts tool outputs in `tools.js` to 50 lines and 2000 characters so rolling token buckets do not exhaust.
+
+---
+
 ## What It Does
 
 - **Works with any model selected in the web app**: You choose the model in the UI (like **Argon**, **GPT-6.1 Sol**, **GPT-6 Astra**, **Fable 5.5 / 5.1**, or **Claude Opus 5.5**), and the bridge uses it dynamically.
@@ -72,18 +94,18 @@ flowchart TD
 
 ## Quick Start
 
-### 🤖 One-Click Prompt for Coding Agents (Cursor / Antigravity / Claude Code)
-If you use an AI coding assistant, just paste this prompt and let the agent configure everything:
+### 🤖 One-Click Setup Prompt for Coding Agents (Cursor / Antigravity / Claude Code)
+If you use an AI coding assistant, paste this prompt into your agent to set up the safe, visible tab mode automatically:
 
-> **Copy-paste this prompt into your agent:**
+> **Copy-paste this prompt into your AI agent:**
 > ```text
-> Set up Gemini Bridge as my local OpenAI-compatible provider:
+> Help me set up Gemini Bridge with maximum account safety (Visible Chrome Tab Mode):
 > 1. Clone https://github.com/CoderBhoid/gemini-bridge into my workspace and run `npm install`.
-> 2. Start the bridge service (`npm start` or `node cli.js`) listening on port 8765.
+> 2. Start the bridge service with safety mode (`npm start` or `node cli.js --safe`) listening on port 8765.
 > 3. Ask me which webchat interface I want to use (Google Gemini, ChatGPT, or Claude).
-> 4. Prompt me to open that webchat in Chrome with the Gemini Bridge extension enabled, and let me choose ANY model I prefer directly in that webchat.
+> 4. Instruct me to load the unpacked extension from `chrome-extension/` in Chrome, open my chosen webchat tab, and pick ANY model I prefer in that webchat. Emphasize that for 100% account safety, I should keep the Chrome window open (it can sit on a secondary monitor or background workspace).
 > 5. Query `http://localhost:8765/v1/models` to dynamically detect the active model reported by my connected browser tab.
-> 6. Configure this agent / workspace to use base URL `http://localhost:8765/v1` with that detected model (or `gemini-web`), send a test completion to verify, and confirm when ready.
+> 6. Configure this workspace / agent to use base URL `http://localhost:8765/v1` with that detected model (or `gemini-web`), send a test completion to verify, and confirm when ready.
 > ```
 
 ---
@@ -99,15 +121,19 @@ npm install
 
 ### 2. Choose How to Run the Browser
 
-#### Method A: Normal Browser Mode (Visible Tab)
+#### Method A: Visible Tab Mode (Strongly Recommended for Account Safety)
+This is the default and safest method. It uses your real Chrome window with genuine session tokens and zero headless flags.
 1. Open Google Chrome and go to `chrome://extensions/`.
-2. Turn on **Developer mode** in the top right.
+2. Turn on **Developer mode** in the top right corner.
 3. Click **Load unpacked** and select the `chrome-extension/` directory.
-4. Open [Gemini](https://gemini.google.com), [ChatGPT](https://chatgpt.com), or [Claude](https://claude.ai).
-5. A floating badge will appear in the bottom-left corner showing your active model and connection status.
+4. Open [Gemini](https://gemini.google.com), [ChatGPT](https://chatgpt.com), or [Claude](https://claude.ai) in a tab and select your preferred model.
+5. Keep this Chrome window open while coding (you can move it to a secondary monitor or background desktop workspace).
+6. The floating badge in the bottom-left will turn green: `Agent Bridge: Ready [Platform: Model | Safe Mode]`.
 
-#### Method B: Headless Background Mode (No Open Windows)
-If you want to keep your desktop clean without browser windows open:
+#### Method B: Headless Background Mode (Experimental / Higher Risk)
+> ⚠️ **Warning**: Headless mode strips GPU contexts and sets automation indicators (`navigator.webdriver`) that can trigger CAPTCHAs, bot challenges, or account flags. For daily development on your personal account, use Method A (Visible Tab Mode) above.
+
+If you understand the risks and want to run Chrome in the background without open windows:
 1. Run one-time setup to log into your account:
    ```bash
    npm run headless:login
