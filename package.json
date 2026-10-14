@@ -22,8 +22,8 @@
     "termux",
     "system1"
   ],
-  "author": "Ayush Pal <officialbhoid@gmail.com>",
-  "homepage": "https://sednium.com",
+  "author": "bhoid <officialbhoid@gmail.com>",
+  "homepage": "https://github.com/CoderBhoid/gemini-bridge",
   "license": "MIT",
   "dependencies": {
     "ws": "^8.18.0"

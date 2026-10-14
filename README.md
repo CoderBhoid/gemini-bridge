@@ -1,12 +1,12 @@
 <div align="center">
   <h1>Gemini Bridge</h1>
   <p><strong>Universal Webchat Harness and OpenAI Proxy for Local Developer Agents</strong></p>
-  <p>Developer: <strong>Ayush Pal</strong> (<a href="https://github.com/CoderBhoid">@CoderBhoid</a>) · Publisher: <strong>Sednium Technologies</strong> (<a href="https://sednium.com">sednium.com</a>)</p>
+  <p>Developer: <strong>bhoid</strong> (<a href="https://github.com/CoderBhoid">@CoderBhoid</a>)</p>
   <p>
     <a href="https://github.com/CoderBhoid/gemini-bridge"><img src="https://img.shields.io/badge/version-1.0.0-EC5E27?style=for-the-badge" alt="Version" /></a>
     <a href="https://github.com/CoderBhoid/gemini-bridge/stargazers"><img src="https://img.shields.io/badge/stars-give%20a%20star-yellow?style=for-the-badge&logo=github" alt="GitHub Stars" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License" /></a>
-    <a href="mailto:support@sednium.com"><img src="https://img.shields.io/badge/support-support%40sednium.com-blue?style=for-the-badge" alt="Support Email" /></a>
+    <a href="mailto:officialbhoid@gmail.com"><img src="https://img.shields.io/badge/contact-officialbhoid%40gmail.com-blue?style=for-the-badge" alt="Contact Email" /></a>
   </p>
 </div>
 
@@ -188,22 +188,21 @@ If you notice message limits ending quickly during long agent runs:
 If Gemini Bridge helps your workflow or saves you API bills, give the project a star on GitHub! It helps other developers find the tool.
 
 - **Star the Repo**: [GitHub Repository](https://github.com/CoderBhoid/gemini-bridge)
-- **Report Bugs**: Open an issue on GitHub or email `support@sednium.com`.
+- **Report Bugs**: Open an issue on GitHub or email `officialbhoid@gmail.com`.
 - **Contributions**: Pull requests for new webchat DOM adapters or tools are welcome.
 
 ---
 
 ## Authors & Credits
 
-- **Sole Developer**: **Ayush Pal** ([@CoderBhoid](https://github.com/CoderBhoid))
-- **Publisher**: **Sednium Technologies** ([sednium.com](https://sednium.com))
-- **Contact & Support**: [officialbhoid@gmail.com](mailto:officialbhoid@gmail.com) / [support@sednium.com](mailto:support@sednium.com)
+- **Developer**: **bhoid** ([@CoderBhoid](https://github.com/CoderBhoid))
+- **Contact & Support**: [officialbhoid@gmail.com](mailto:officialbhoid@gmail.com)
 
 ---
 
 ## Code of Conduct
 
-This project is governed by the [Contributor Covenant](CODE_OF_CONDUCT.md), version 2.1. By participating, you agree to uphold this standard. Report any issues to [support@sednium.com](mailto:support@sednium.com).
+This project is governed by the [Contributor Covenant](CODE_OF_CONDUCT.md), version 2.1. By participating, you agree to uphold this standard. Report any issues to [officialbhoid@gmail.com](mailto:officialbhoid@gmail.com).
 
 ---
 
@@ -211,4 +210,4 @@ This project is governed by the [Contributor Covenant](CODE_OF_CONDUCT.md), vers
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for the full license text.
 
-Copyright (c) 2026 **Ayush Pal (Sednium Technologies)**.
+Copyright (c) 2026 **bhoid (CoderBhoid)**.
