@@ -1,12 +1,13 @@
 <div align="center">
   <h1>Gemini Bridge</h1>
   <p><strong>Universal Webchat Harness and OpenAI Proxy for Local Developer Agents</strong></p>
-  <p>Developer: <strong>bhoid</strong> (<a href="https://github.com/CoderBhoid">@CoderBhoid</a>)</p>
+  <p>Developer: <strong>bhoid</strong> (<a href="https://github.com/CoderBhoid">@CoderBhoid</a> · <a href="https://bhoid.sednium.com">bhoid.sednium.com</a>)</p>
   <p>
     <a href="https://github.com/CoderBhoid/gemini-bridge"><img src="https://img.shields.io/badge/version-1.0.0-EC5E27?style=for-the-badge" alt="Version" /></a>
     <a href="https://github.com/CoderBhoid/gemini-bridge/stargazers"><img src="https://img.shields.io/badge/stars-give%20a%20star-yellow?style=for-the-badge&logo=github" alt="GitHub Stars" /></a>
+    <a href="https://bhoid.sednium.com"><img src="https://img.shields.io/badge/website-bhoid.sednium.com-7C3AED?style=for-the-badge" alt="Website" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License" /></a>
-    <a href="mailto:officialbhoid@gmail.com"><img src="https://img.shields.io/badge/contact-officialbhoid%40gmail.com-blue?style=for-the-badge" alt="Contact Email" /></a>
+    <a href="mailto:bhoid@sednium.com"><img src="https://img.shields.io/badge/contact-bhoid%40sednium.com-blue?style=for-the-badge" alt="Contact Email" /></a>
   </p>
 </div>
 
@@ -20,7 +21,7 @@ If you have an Android phone, you can also offload token pruning and destructive
 
 ## What It Does
 
-- **Works with any model selected in the web app**: You choose the model in the UI (Gemini 2.0 Flash, Gemini Advanced, Gemini 1.5 Pro, Claude 3.7 Sonnet, GPT-4o), and the bridge uses it dynamically.
+- **Works with any model selected in the web app**: You choose the model in the UI (like **Gemini 4 Pro Argon**, **GPT-6.1 Sol**, **GPT-6 Astra**, **Fable 5.5 / 5.1**, or **Claude 4 Opus**), and the bridge uses it dynamically.
 - **Universal webchat support**: One Chrome extension works across `gemini.google.com`, `chatgpt.com`, and `claude.ai`.
 - **OpenAI-compatible server**: Drop `http://localhost:8765/v1` into Cursor, Antigravity, OpenClaude, Continue.dev, or the Python OpenAI SDK.
 - **Autonomous terminal loop**: Run commands and edits through the `gemini-bridge>` CLI with markdown tool blocks.
@@ -101,18 +102,18 @@ If you want to keep your desktop clean without browser windows open:
    ```
    Chrome will run silently in the background, attach to the bridge, and process agent prompts.
 
-### 3. Connect Android Phone (Optional)
-If you want to offload token pruning and command safety checks to your phone:
-1. In Android Termux:
-   ```bash
-   pkg update && pkg install nodejs-lts git
-   node phone-bridge/phone_laya_server.js
-   ```
+### 3. Connect Android Phone via Oorty (Laya System 1 Offload)
+To prevent token exhaustion and stop webchat rate limits from dying early:
+1. Install **Oorty** on your Android phone and turn on the **Laya server** from inside Oorty (or in Termux via `node phone-bridge/phone_laya_server.js`).
 2. Connect your phone via USB and run:
    ```bash
    bash phone-bridge/adb_connect.sh
    ```
-   *If the phone is not connected, the bridge skips offload and runs normally.*
+   This establishes a zero-latency reverse proxy on port 8000 (`localhost:8000`).
+3. **System 1 Token Reducing**: Laya runs as a local on-device filter on your phone:
+   - **Output Pruning (`/prune`)**: Automatically trims verbose build logs and repetitive terminal lines before they get sent to the webchat, preserving up to 90% of your input tokens.
+   - **Destructive Command Risk Gate (`/risk`)**: Checks commands locally for dangerous shell operations before execution.
+   *If the phone or Oorty is not running, Gemini Bridge gracefully bypasses offload with zero delay.*
 
 ### 4. Start the Agent Loop
 ```bash
@@ -132,7 +133,7 @@ Gemini Bridge exposes an OpenAI-compatible API at `http://localhost:8765/v1`.
 ### Cursor / Antigravity / Continue.dev
 - **Base URL**: `http://localhost:8765/v1`
 - **API Key**: Any placeholder (e.g. `sk-gemini-bridge`)
-- **Model**: `gemini-web`, `gemini-2.0-flash`, `claude-3-7-sonnet`, `gpt-4o`
+- **Model**: `gemini-4-pro-argon`, `gpt-6.1-sol`, `gpt-6-astra`, `fable-5.5`, `fable-5.1`, `claude-4-opus`, `gemini-web`
 
 ### Python OpenAI Client
 ```python
@@ -144,7 +145,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="gemini-web",
+    model="gemini-4-pro-argon",
     messages=[{"role": "user", "content": "Write a short bash script to check disk usage."}]
 )
 print(response.choices[0].message.content)
@@ -158,8 +159,8 @@ If you notice message limits ending quickly during long agent runs:
 
 1. **Understand Context Accumulation**: In webchat interfaces, each turn retains previous message history. A 10-turn conversation with large terminal outputs can send over 40,000 tokens on every turn.
 2. **Reset Threads for New Tasks**: Open a fresh chat session for a new task rather than letting one thread grow indefinitely.
-3. **Use Flash for Tool Execution**: Switch your webchat dropdown to **Gemini 2.0 Flash** for mechanical coding loops (`npm test`, `git status`). Use **Gemini Advanced / Argon** when you need heavy architecture planning.
-4. **Phone Pruning**: Running `phone-bridge/phone_laya_server.js` automatically trims verbose logs to keep prompts compact.
+3. **Use Fast Models for Tool Execution**: Select lighter, fast models for repetitive terminal loops. Switch to **Gemini 4 Pro Argon**, **GPT-6.1 Sol**, or **Fable 5.5** when you need heavy architecture planning.
+4. **Oorty Laya Offload**: Turning on the Laya server from Oorty on your phone automatically prunes verbose logs before they reach the webchat.
 
 ---
 
@@ -188,21 +189,21 @@ If you notice message limits ending quickly during long agent runs:
 If Gemini Bridge helps your workflow or saves you API bills, give the project a star on GitHub! It helps other developers find the tool.
 
 - **Star the Repo**: [GitHub Repository](https://github.com/CoderBhoid/gemini-bridge)
-- **Report Bugs**: Open an issue on GitHub or email `officialbhoid@gmail.com`.
+- **Report Bugs**: Open an issue on GitHub or email `bhoid@sednium.com`.
 - **Contributions**: Pull requests for new webchat DOM adapters or tools are welcome.
 
 ---
 
 ## Authors & Credits
 
-- **Developer**: **bhoid** ([@CoderBhoid](https://github.com/CoderBhoid))
-- **Contact & Support**: [officialbhoid@gmail.com](mailto:officialbhoid@gmail.com)
+- **Developer**: **bhoid** ([@CoderBhoid](https://github.com/CoderBhoid) · [bhoid.sednium.com](https://bhoid.sednium.com))
+- **Contact & Support**: [bhoid@sednium.com](mailto:bhoid@sednium.com)
 
 ---
 
 ## Code of Conduct
 
-This project is governed by the [Contributor Covenant](CODE_OF_CONDUCT.md), version 2.1. By participating, you agree to uphold this standard. Report any issues to [officialbhoid@gmail.com](mailto:officialbhoid@gmail.com).
+This project is governed by the [Contributor Covenant](CODE_OF_CONDUCT.md), version 2.1. By participating, you agree to uphold this standard. Report any issues to [bhoid@sednium.com](mailto:bhoid@sednium.com).
 
 ---
 
