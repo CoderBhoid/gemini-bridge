@@ -86,6 +86,9 @@ npm install
 ```
 
 ### 2. Load Chrome Extension
+You can run Gemini Bridge in two ways: **Interactive Browser Mode** or **Headless Background Mode**.
+
+#### Mode A: Interactive Browser Mode (Standard)
 1. Open Google Chrome and go to `chrome://extensions/`.
 2. Enable **Developer mode** (toggle in upper right).
 3. Click **Load unpacked** and select the `chrome-extension/` directory.
@@ -94,6 +97,21 @@ npm install
    - [ChatGPT](https://chatgpt.com)
    - [Claude](https://claude.ai)
 5. Look for the floating badge in the bottom-left corner (`Agent Bridge: Ready [Platform: Model]`).
+
+#### Mode B: Headless Background Mode (No Visible Windows)
+If you don't want to keep a Chrome window open on your screen:
+1. Perform one-time interactive login to your webchat account:
+   ```bash
+   npm run headless:login
+   # Or: ./launch-headless.sh --login https://gemini.google.com
+   ```
+2. Close the browser window once logged in.
+3. Launch the invisible background daemon anytime:
+   ```bash
+   npm run headless
+   # Or: ./launch-headless.sh
+   ```
+   *Chrome now runs invisibly in RAM, automatically connects to Gemini Bridge, and stays out of your way.*
 
 ### 3. Connect Android Phone (Optional)
 1. In Android Termux:
@@ -112,6 +130,33 @@ npm install
 npm start
 ```
 Type any objective at the `gemini-bridge>` prompt.
+
+---
+
+## Client Integration Examples
+
+Gemini Bridge exposes a drop-in OpenAI-compatible API on `http://localhost:8765/v1`. You can plug it into any tool or agent:
+
+### Cursor / Antigravity / Continue.dev
+- **Base URL**: `http://localhost:8765/v1`
+- **API Key**: Any dummy string (e.g. `sk-gemini-bridge`)
+- **Model**: `gemini-web`, `gemini-2.0-flash`, `claude-3-7-sonnet`, `gpt-4o`, etc.
+
+### Python OpenAI SDK
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:8765/v1",
+    api_key="gemini-bridge-key"
+)
+
+response = client.chat.completions.create(
+    model="gemini-web",
+    messages=[{"role": "user", "content": "Explain quantum computing briefly."}]
+)
+print(response.choices[0].message.content)
+```
 
 ---
 

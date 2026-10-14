@@ -8,7 +8,9 @@
   },
   "scripts": {
     "start": "node cli.js",
-    "test": "node cli.js --test"
+    "test": "node cli.js --test",
+    "headless": "./launch-headless.sh",
+    "headless:login": "./launch-headless.sh --login"
   },
   "keywords": [
     "gemini",
