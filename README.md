@@ -1,7 +1,7 @@
 <div align="center">
   <h1>Gemini Bridge</h1>
   <p><strong>Universal Webchat Harness and OpenAI Proxy for Local Developer Agents</strong></p>
-  <p>Developer: <strong>bhoid</strong> (<a href="https://github.com/CoderBhoid">@CoderBhoid</a> · <a href="https://bhoid.sednium.com">bhoid.sednium.com</a>)</p>
+  <p>Developer: <strong>Bhoid</strong> (<a href="https://github.com/CoderBhoid">@CoderBhoid</a> · <a href="https://bhoid.sednium.com">bhoid.sednium.com</a>)</p>
   <p>
     <a href="https://github.com/CoderBhoid/gemini-bridge"><img src="https://img.shields.io/badge/version-1.0.0-EC5E27?style=for-the-badge" alt="Version" /></a>
     <a href="https://github.com/CoderBhoid/gemini-bridge/stargazers"><img src="https://img.shields.io/badge/stars-give%20a%20star-yellow?style=for-the-badge&logo=github" alt="GitHub Stars" /></a>
@@ -15,7 +15,7 @@
 
 Gemini Bridge connects local coding agents to active browser sessions on Google Gemini, ChatGPT, and Claude. It lets you use web interfaces directly from your terminal or IDE, executes local developer tools (`run_command`, `read_file`, `write_file`), and exposes a local OpenAI-compatible API on `http://localhost:8765/v1`.
 
-You can also use your Android phone as a **Pocket Server running Laya for System 1 models**. Laya runs on-device via Oorty to handle fast-path gating, safety checks, and token reducing before prompts ever reach your cloud webchat session.
+You can also use your Android phone as a **Pocket Server running Laya for System 1 models**. Laya runs on-device via [Oorty](https://github.com/Sednium-Technologies/OORTY) ([APK releases](https://github.com/Sednium-Technologies/OORTY/releases)) or standalone Termux to handle fast-path gating, safety checks, and token reducing before prompts ever reach your cloud webchat session.
 
 ---
 
@@ -79,9 +79,11 @@ If you use an AI coding assistant, just paste this prompt and let the agent conf
 > ```text
 > Set up Gemini Bridge as my local OpenAI-compatible provider:
 > 1. Clone https://github.com/CoderBhoid/gemini-bridge into my workspace and run `npm install`.
-> 2. Start the bridge via `npm start` (or `node cli.js`) on port 8765.
-> 3. Verify http://localhost:8765/v1/models is responding.
-> 4. Point this agent / workspace to base URL `http://localhost:8765/v1` with model 'argon' or 'gpt-6.1-sol'.
+> 2. Start the bridge service (`npm start` or `node cli.js`) listening on port 8765.
+> 3. Ask me which webchat interface I want to use (Google Gemini, ChatGPT, or Claude).
+> 4. Prompt me to open that webchat in Chrome with the Gemini Bridge extension enabled, and let me choose ANY model I prefer directly in that webchat.
+> 5. Query `http://localhost:8765/v1/models` to dynamically detect the active model reported by my connected browser tab.
+> 6. Configure this agent / workspace to use base URL `http://localhost:8765/v1` with that detected model (or `gemini-web`), send a test completion to verify, and confirm when ready.
 > ```
 
 ---
@@ -120,13 +122,15 @@ If you want to keep your desktop clean without browser windows open:
 
 ### 3. Connect Android Phone via Oorty (Pocket Server Laya Offload)
 To prevent token exhaustion and stop webchat rate limits from dying early:
-1. Install **Oorty** on your Android phone and turn on the **Laya server** from inside Oorty (or in Termux via `node phone-bridge/phone_laya_server.js`).
-2. Connect your phone via USB and run:
+1. Download and install **[Oorty Mobile](https://github.com/Sednium-Technologies/OORTY/releases)** (APK available from the [Sednium-Technologies/OORTY](https://github.com/Sednium-Technologies/OORTY) repository) on your Android device. Oorty acts as an on-device model supervisor and pocket server.
+2. Inside Oorty, enable the **Laya server** on port 8000.
+   *(Alternatively, if you don't have the Oorty app, run the bundled script in Termux: `bash phone-bridge/termux_setup.sh`)*.
+3. Connect your phone via USB and run:
    ```bash
    bash phone-bridge/adb_connect.sh
    ```
    This establishes a zero-latency reverse proxy on port 8000 (`localhost:8000`).
-3. **System 1 Token Reducing**: Laya runs as a local on-device filter on your phone:
+4. **System 1 Token Reducing**: Laya runs as a local on-device filter on your phone:
    - **Output Pruning (`/prune`)**: Automatically trims verbose build logs and repetitive terminal lines before they get sent to the webchat, preserving up to 90% of your input tokens.
    - **Destructive Command Risk Gate (`/risk`)**: Checks commands locally for dangerous shell operations before execution.
    *If the phone or Oorty is not running, Gemini Bridge gracefully bypasses offload with zero delay.*
@@ -149,7 +153,7 @@ Gemini Bridge exposes an OpenAI-compatible API at `http://localhost:8765/v1`.
 ### Cursor / Antigravity / Continue.dev
 - **Base URL**: `http://localhost:8765/v1`
 - **API Key**: Any placeholder (e.g. `sk-gemini-bridge`)
-- **Model**: `argon`, `gpt-6.1-sol`, `gpt-6-astra`, `fable-5.5`, `fable-5.1`, `claude-opus-5-5`, `gemini-web`
+- **Model**: Any model active in your webchat tab (detected dynamically via `/v1/models`), or `gemini-web`
 
 ### Python OpenAI Client
 ```python
@@ -212,7 +216,7 @@ If Gemini Bridge helps your workflow or saves you API bills, give the project a 
 
 ## Authors & Credits
 
-- **Developer**: **bhoid** ([@CoderBhoid](https://github.com/CoderBhoid) · [bhoid.sednium.com](https://bhoid.sednium.com))
+- **Developer**: **Bhoid** ([@CoderBhoid](https://github.com/CoderBhoid) · [bhoid.sednium.com](https://bhoid.sednium.com))
 - **Contact & Support**: [bhoid@sednium.com](mailto:bhoid@sednium.com)
 
 ---
@@ -227,4 +231,4 @@ This project is governed by the [Contributor Covenant](CODE_OF_CONDUCT.md), vers
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for the full license text.
 
-Copyright (c) 2026 **bhoid (CoderBhoid)**.
+Copyright (c) 2026 **Bhoid (CoderBhoid)**.

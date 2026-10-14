@@ -22,7 +22,7 @@
     "termux",
     "system1"
   ],
-  "author": "bhoid <bhoid@sednium.com>",
+  "author": "Bhoid <bhoid@sednium.com>",
   "homepage": "https://bhoid.sednium.com",
   "license": "MIT",
   "dependencies": {
