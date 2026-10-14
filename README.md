@@ -227,6 +227,15 @@ This project is governed by the [Contributor Covenant](CODE_OF_CONDUCT.md), vers
 
 ---
 
+## ⚠️ Disclaimer & Terms of Service
+
+- **Educational & Research Use**: Gemini Bridge is an independent developer experiment exploring browser DOM adapters and local agent workflows. It is provided strictly for educational and personal testing purposes.
+- **Third-Party Terms of Service**: Automating web chat interfaces may violate or conflict with the Terms of Service of Google (Gemini), OpenAI (ChatGPT), or Anthropic (Claude), which typically require using their official developer APIs for programmatic access. Using automation on web accounts carries inherent risks, including rate limits, CAPTCHA challenges, or account restrictions.
+- **No Affiliation**: This project is not affiliated, endorsed, sponsored, or supported by Google, OpenAI, Anthropic, or any of their subsidiaries. All trademarks, service marks, and brand names belong to their respective owners.
+- **Limitation of Liability**: This tool is provided "as is" without warranty of any kind. The author(s) and contributor(s) are not responsible or liable for any account actions, bans, service disruptions, or ToS violations resulting from the use of this project. You use this software entirely at your own discretion and risk.
+
+---
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for the full license text.
