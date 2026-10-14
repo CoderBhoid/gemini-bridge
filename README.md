@@ -1,226 +1,214 @@
-# Gemini Bridge
-
-**Gemini Bridge** is a high-performance, model-agnostic webchat orchestrator and OpenAI-compatible proxy that connects local agentic workflows directly to active browser sessions on Google Gemini, ChatGPT, and Claude. It features automated DOM interaction, local developer tool execution (`run_command`, `read_file`, `write_file`), and optional Android Phone System 1 offload for token pruning and command safety verification.
+<div align="center">
+  <h1>Gemini Bridge</h1>
+  <p><strong>Universal Webchat Harness and OpenAI Proxy for Local Developer Agents</strong></p>
+  <p>Developer: <strong>Ayush Pal</strong> (<a href="https://github.com/CoderBhoid">@CoderBhoid</a>) · Publisher: <strong>Sednium Technologies</strong> (<a href="https://sednium.com">sednium.com</a>)</p>
+  <p>
+    <a href="https://github.com/CoderBhoid/gemini-bridge"><img src="https://img.shields.io/badge/version-1.0.0-EC5E27?style=for-the-badge" alt="Version" /></a>
+    <a href="https://github.com/CoderBhoid/gemini-bridge/stargazers"><img src="https://img.shields.io/badge/stars-give%20a%20star-yellow?style=for-the-badge&logo=github" alt="GitHub Stars" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License" /></a>
+    <a href="mailto:support@sednium.com"><img src="https://img.shields.io/badge/support-support%40sednium.com-blue?style=for-the-badge" alt="Support Email" /></a>
+  </p>
+</div>
 
 ---
 
-## Key Features
+Gemini Bridge connects local coding agents to active browser sessions on Google Gemini, ChatGPT, and Claude. It lets you use web interfaces directly from your terminal or IDE, executes local developer tools (`run_command`, `read_file`, `write_file`), and exposes a local OpenAI-compatible API on `http://localhost:8765/v1`.
 
-- **Universal Multi-Platform Support**: Works out of the box with `gemini.google.com`, `chatgpt.com` / `chat.openai.com`, and `claude.ai`.
-- **Dynamic Model Tracking**: Automatically detects the active model selected in the web interface (Gemini 2.0 Flash, Claude 3.7 Sonnet, GPT-4o, etc.) and exposes it dynamically via `/v1/models`.
-- **OpenAI-Compatible Proxy**: Drop-in replacement endpoint at `http://localhost:8765/v1/chat/completions` supporting both SSE streaming and non-streaming responses for Cursor, Antigravity, OpenClaude, and custom agent SDKs.
-- **Autonomous Agentic Loop**: Interactive CLI prompt (`gemini-bridge>`) supporting local tool calls formatted in clean markdown blocks.
-- **Local Developer Tool Suite**: Built-in, safety-bounded implementations of `run_command`, `read_file`, and `write_file` with automated output truncation.
-- **Phone System 1 Offload**: Integrates with an Android phone running Termux over low-latency ADB reverse (`localhost:8000`) to evaluate command risk (`/risk`) and prune verbose outputs (`/prune`), gracefully bypassing if disconnected.
-- **Visual Status Overlay**: Floating, non-intrusive bottom-left badge inside the web browser displaying connection state and active model in real time.
+If you have an Android phone, you can also offload token pruning and destructive command checks to a local Termux microservice over ADB reverse.
+
+---
+
+## What It Does
+
+- **Works with any model selected in the web app**: You choose the model in the UI (Gemini 2.0 Flash, Gemini Advanced, Gemini 1.5 Pro, Claude 3.7 Sonnet, GPT-4o), and the bridge uses it dynamically.
+- **Universal webchat support**: One Chrome extension works across `gemini.google.com`, `chatgpt.com`, and `claude.ai`.
+- **OpenAI-compatible server**: Drop `http://localhost:8765/v1` into Cursor, Antigravity, OpenClaude, Continue.dev, or the Python OpenAI SDK.
+- **Autonomous terminal loop**: Run commands and edits through the `gemini-bridge>` CLI with markdown tool blocks.
+- **Local tool runner**: Executes shell commands, reads file slices, and writes files safely on your local disk with output limits.
+- **Headless background daemon**: Run Chrome invisibly in RAM without an open browser window cluttering your desktop.
+- **Android Phone offload**: Connect an Android phone via USB to run token pruning and command safety checks in Termux.
 
 ---
 
 ## Tech Stack
 
-| Component | Technology | Description |
-| :--- | :--- | :--- |
-| **CLI & Proxy** | Node.js, `http`, `readline` | Orchestrator, CLI loop, and OpenAI proxy |
-| **Communication** | `ws` (WebSocket) | Full-duplex messaging between CLI and Browser |
-| **Extension** | Chrome Manifest V3 | DOM automation and response observation |
-| **Mobile Offload** | Android Termux, ADB | System 1 fast-gating and token pruning |
+- **CLI Server**: Node.js HTTP and WebSocket (`ws`) server exposing `/v1/chat/completions` and `/v1/models`.
+- **Browser Extension**: Manifest V3 content script running DOM adapters for Gemini, ChatGPT, and Claude.
+- **Tool Engine**: Local child process runner and atomic file system utilities.
+- **Phone Microservice**: Lightweight Node.js server running in Termux over ADB reverse.
 
 ---
 
-## Architecture Overview
+## Architecture
 
 ```mermaid
 flowchart TD
-    Client[External Client: Cursor / Antigravity / Curl] -->|OpenAI API: POST /v1/chat/completions| CLI[CLI Orchestrator cli.js :8765]
-    Terminal[Interactive Terminal: gemini-bridge] -->|User Goal| CLI
+    Client[Cursor / Antigravity / Python SDK] -->|POST /v1/chat/completions| CLI[CLI Orchestrator :8765]
+    Terminal[Terminal User] -->|Prompt| CLI
 
-    subgraph PhoneOffload [Phone System 1 via ADB Reverse :8000]
-        RiskGate[Safety Gate /risk]
-        OutputPruner[Token Pruner /prune]
+    subgraph Phone [Phone System 1 via ADB :8000]
+        Risk[Safety Filter /risk]
+        Prune[Token Pruner /prune]
     end
 
-    CLI <-->|Optional Fast-Path Gating| PhoneOffload
+    CLI <-->|Optional Check| Phone
     CLI <-->|WebSocket ws://localhost:8765| Ext[Chrome Extension content.js]
 
-    subgraph BrowserWebchats [Universal Browser Sessions]
-        Gemini[gemini.google.com]
-        ChatGPT[chatgpt.com]
-        Claude[claude.ai]
+    subgraph Browsers [Active Browser Tabs]
+        Gemini[Google Gemini]
+        ChatGPT[ChatGPT]
+        Claude[Claude]
     end
 
     Ext <-->|DOM Adapter| Gemini
     Ext <-->|DOM Adapter| ChatGPT
     Ext <-->|DOM Adapter| Claude
 
-    CLI -->|Local Execution| Tools[tools.js: run_command / read_file / write_file]
+    CLI --> Tools[Local Tools: run_command, read_file, write_file]
 ```
 
-### Request Lifecycle
-1. The client sends a request to the interactive CLI or the `/v1/chat/completions` proxy.
-2. The orchestrator formats the conversation history and available tool specifications into a unified prompt.
-3. The prompt is transmitted over WebSocket (`ws://localhost:8765`) to `content.js` in Chrome.
-4. The content script injects the prompt into the active platform's input element, triggers submission, and monitors DOM mutations until completion.
-5. The extracted response is returned via WebSocket.
-6. If the response contains a tool call (e.g. `run_command`):
-   - Safety check is queried from Phone System 1 (`/risk`).
-   - The tool executes locally.
-   - Result is pruned (`/prune`) and fed back into the next loop turn.
-7. If final answer is reached, it is streamed back to the client.
-
 ---
 
-## Prerequisites
+## Quick Start
 
-- **Node.js**: v18.0.0 or higher.
-- **Google Chrome** (or Chromium-based browser: Brave, Edge, Vivaldi).
-- **Android Phone** (Optional, for System 1 offload): Termux and USB debugging enabled.
-
----
-
-## Getting Started
-
-### 1. Installation
+### 1. Install Dependencies
 ```bash
-cd "/run/media/bhoid/StorageVault/WEbs/Gemini Bridge"
+git clone https://github.com/CoderBhoid/gemini-bridge.git
+cd gemini-bridge
 npm install
 ```
 
-### 2. Load Chrome Extension
-You can run Gemini Bridge in two ways: **Interactive Browser Mode** or **Headless Background Mode**.
+### 2. Choose How to Run the Browser
 
-#### Mode A: Interactive Browser Mode (Standard)
+#### Method A: Normal Browser Mode (Visible Tab)
 1. Open Google Chrome and go to `chrome://extensions/`.
-2. Enable **Developer mode** (toggle in upper right).
+2. Turn on **Developer mode** in the top right.
 3. Click **Load unpacked** and select the `chrome-extension/` directory.
-4. Open your preferred webchat:
-   - [Google Gemini](https://gemini.google.com)
-   - [ChatGPT](https://chatgpt.com)
-   - [Claude](https://claude.ai)
-5. Look for the floating badge in the bottom-left corner (`Agent Bridge: Ready [Platform: Model]`).
+4. Open [Gemini](https://gemini.google.com), [ChatGPT](https://chatgpt.com), or [Claude](https://claude.ai).
+5. A floating badge will appear in the bottom-left corner showing your active model and connection status.
 
-#### Mode B: Headless Background Mode (No Visible Windows)
-If you don't want to keep a Chrome window open on your screen:
-1. Perform one-time interactive login to your webchat account:
+#### Method B: Headless Background Mode (No Open Windows)
+If you want to keep your desktop clean without browser windows open:
+1. Run one-time setup to log into your account:
    ```bash
    npm run headless:login
    # Or: ./launch-headless.sh --login https://gemini.google.com
    ```
 2. Close the browser window once logged in.
-3. Launch the invisible background daemon anytime:
+3. Start the headless background daemon anytime:
    ```bash
    npm run headless
-   # Or: ./launch-headless.sh
    ```
-   *Chrome now runs invisibly in RAM, automatically connects to Gemini Bridge, and stays out of your way.*
+   Chrome will run silently in the background, attach to the bridge, and process agent prompts.
 
 ### 3. Connect Android Phone (Optional)
+If you want to offload token pruning and command safety checks to your phone:
 1. In Android Termux:
    ```bash
    pkg update && pkg install nodejs-lts git
    node phone-bridge/phone_laya_server.js
    ```
-2. On your laptop, connect phone via USB and run:
+2. Connect your phone via USB and run:
    ```bash
    bash phone-bridge/adb_connect.sh
    ```
-   *If the phone is not connected, Gemini Bridge operates normally without delays.*
+   *If the phone is not connected, the bridge skips offload and runs normally.*
 
-### 4. Launch the CLI Orchestrator
+### 4. Start the Agent Loop
 ```bash
 npm start
 ```
-Type any objective at the `gemini-bridge>` prompt.
+Enter your goal at the `gemini-bridge>` prompt:
+```
+gemini-bridge> inspect package.json and add a test script
+```
 
 ---
 
-## Client Integration Examples
+## Client Integration
 
-Gemini Bridge exposes a drop-in OpenAI-compatible API on `http://localhost:8765/v1`. You can plug it into any tool or agent:
+Gemini Bridge exposes an OpenAI-compatible API at `http://localhost:8765/v1`.
 
 ### Cursor / Antigravity / Continue.dev
 - **Base URL**: `http://localhost:8765/v1`
-- **API Key**: Any dummy string (e.g. `sk-gemini-bridge`)
-- **Model**: `gemini-web`, `gemini-2.0-flash`, `claude-3-7-sonnet`, `gpt-4o`, etc.
+- **API Key**: Any placeholder (e.g. `sk-gemini-bridge`)
+- **Model**: `gemini-web`, `gemini-2.0-flash`, `claude-3-7-sonnet`, `gpt-4o`
 
-### Python OpenAI SDK
+### Python OpenAI Client
 ```python
 from openai import OpenAI
 
 client = OpenAI(
     base_url="http://localhost:8765/v1",
-    api_key="gemini-bridge-key"
+    api_key="gemini-bridge"
 )
 
 response = client.chat.completions.create(
     model="gemini-web",
-    messages=[{"role": "user", "content": "Explain quantum computing briefly."}]
+    messages=[{"role": "user", "content": "Write a short bash script to check disk usage."}]
 )
 print(response.choices[0].message.content)
 ```
 
 ---
 
-## API Reference
+## Managing Token Limits and Quotas
 
-### OpenAI-Compatible HTTP Proxy
+If you notice message limits ending quickly during long agent runs:
 
-#### `GET /v1/models`
-Returns currently attached browser session model and standard model aliases.
-```bash
-curl http://localhost:8765/v1/models
-```
-
-#### `POST /v1/chat/completions`
-Send standard OpenAI chat payloads. Supports any model name and streaming (`"stream": true`).
-```bash
-curl http://localhost:8765/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gemini-web",
-    "messages": [
-      {"role": "user", "content": "List the files in the current directory using run_command."}
-    ],
-    "stream": false
-  }'
-```
-
-### WebSocket Protocol Messages (`ws://localhost:8765`)
-
-| Direction | Message Type | Payload Structure | Description |
-| :--- | :--- | :--- | :--- |
-| **Browser → CLI** | `HELLO` | `{ "type": "HELLO", "platform": string, "model": string, "url": string }` | Sent immediately on connection |
-| **Browser → CLI** | `STATUS` | `{ "type": "STATUS", "platform": string, "model": string }` | Sent when active model changes |
-| **CLI → Browser** | `PROMPT` | `{ "type": "PROMPT", "text": string }` | Sends prompt for webchat injection |
-| **Browser → CLI** | `RESPONSE` | `{ "type": "RESPONSE", "text": string }` | Returns completed assistant response |
-| **Browser → CLI** | `ERROR` | `{ "type": "ERROR", "message": string }` | Sent if DOM injection or observation fails |
+1. **Understand Context Accumulation**: In webchat interfaces, each turn retains previous message history. A 10-turn conversation with large terminal outputs can send over 40,000 tokens on every turn.
+2. **Reset Threads for New Tasks**: Open a fresh chat session for a new task rather than letting one thread grow indefinitely.
+3. **Use Flash for Tool Execution**: Switch your webchat dropdown to **Gemini 2.0 Flash** for mechanical coding loops (`npm test`, `git status`). Use **Gemini Advanced / Argon** when you need heavy architecture planning.
+4. **Phone Pruning**: Running `phone-bridge/phone_laya_server.js` automatically trims verbose logs to keep prompts compact.
 
 ---
 
-## CLI Options & Flags
+## API & Protocol Reference
 
-```bash
-node cli.js --help      # Show full CLI manual
-node cli.js --test      # Verify syntax and environment readiness
-node cli.js --port 9000 # Listen on custom port (also respects PORT env var)
-```
+### Endpoints
 
----
+- `GET /v1/models`: Lists active browser models and standard aliases.
+- `POST /v1/chat/completions`: Standard OpenAI completions endpoint (supports streaming SSE chunks and JSON).
+- `WS ws://localhost:8765`: Bi-directional bridge socket used by the browser extension.
 
-## Troubleshooting Guide
+### WebSocket Messages
 
-| Issue | Cause | Solution |
+| Message | Origin | Purpose |
 | :--- | :--- | :--- |
-| `Agent Bridge: Disconnected` badge | `cli.js` is not running or port 8765 is blocked | Start `npm start` and verify port 8765 is open. |
-| `503 Browser extension not connected` | No supported webchat tab is open | Open `gemini.google.com`, `chatgpt.com`, or `claude.ai` in Chrome. |
-| Tool execution permission errors | Commands require elevated privileges | Run safe local commands or check directory permissions. |
-| Phone System 1 not detected | ADB reverse port not forwarded | Re-run `bash phone-bridge/adb_connect.sh` and accept USB prompt on phone. |
-| Claude ProseMirror input not registering | Claude DOM structure updated | Extension simulates keyboard `input` and `change` events. Ensure tab has focus. |
+| `HELLO` | Browser → CLI | Reports active platform, model name, and URL on connection. |
+| `STATUS` | Browser → CLI | Fires when you switch models in the web UI. |
+| `PROMPT` | CLI → Browser | Injects prompt and triggers submission in the chat window. |
+| `RESPONSE` | Browser → CLI | Returns completed response once the model finishes generating. |
+| `ERROR` | Browser → CLI | Reports input element or network issues. |
+
+---
+
+## Support & Community
+
+If Gemini Bridge helps your workflow or saves you API bills, give the project a star on GitHub! It helps other developers find the tool.
+
+- **Star the Repo**: [GitHub Repository](https://github.com/CoderBhoid/gemini-bridge)
+- **Report Bugs**: Open an issue on GitHub or email `support@sednium.com`.
+- **Contributions**: Pull requests for new webchat DOM adapters or tools are welcome.
+
+---
+
+## Authors & Credits
+
+- **Sole Developer**: **Ayush Pal** ([@CoderBhoid](https://github.com/CoderBhoid))
+- **Publisher**: **Sednium Technologies** ([sednium.com](https://sednium.com))
+- **Contact & Support**: [officialbhoid@gmail.com](mailto:officialbhoid@gmail.com) / [support@sednium.com](mailto:support@sednium.com)
+
+---
+
+## Code of Conduct
+
+This project is governed by the [Contributor Covenant](CODE_OF_CONDUCT.md), version 2.1. By participating, you agree to uphold this standard. Report any issues to [support@sednium.com](mailto:support@sednium.com).
 
 ---
 
 ## License
 
-MIT
-```
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for the full license text.
 
----
+Copyright (c) 2026 **Ayush Pal (Sednium Technologies)**.

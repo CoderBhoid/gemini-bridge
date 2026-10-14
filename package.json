@@ -22,7 +22,8 @@
     "termux",
     "system1"
   ],
-  "author": "",
+  "author": "Ayush Pal <officialbhoid@gmail.com>",
+  "homepage": "https://sednium.com",
   "license": "MIT",
   "dependencies": {
     "ws": "^8.18.0"
