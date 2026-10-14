@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Gemini Bridge - Universal Webchat Agent Bridge",
+  "version": "1.0.0",
+  "description": "Bi-directional WebSocket harness bridge for Gemini, ChatGPT, and Claude web sessions",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://gemini.google.com/*",
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://gemini.google.com/*",
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

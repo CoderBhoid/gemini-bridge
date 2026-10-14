@@ -1,0 +1,28 @@
+{
+  "name": "gemini-bridge",
+  "version": "1.0.0",
+  "description": "Universal Webchat & Model-Agnostic Agent Bridge for Gemini, ChatGPT, and Claude with Phone System 1 Offload",
+  "main": "cli.js",
+  "bin": {
+    "gemini-bridge": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js",
+    "test": "node cli.js --test"
+  },
+  "keywords": [
+    "gemini",
+    "chatgpt",
+    "claude",
+    "agent",
+    "websocket",
+    "openai-proxy",
+    "termux",
+    "system1"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
