@@ -206,7 +206,7 @@ If you notice message limits ending quickly during long agent runs:
 
 ## Support & Community
 
-If Gemini Bridge helps your workflow or saves you API bills, give the project a star on GitHub! It helps other developers find the tool.
+If Gemini Bridge helps your workflow or research, give the project a star on GitHub! It helps other developers find the project.
 
 - **Star the Repo**: [GitHub Repository](https://github.com/CoderBhoid/gemini-bridge)
 - **Report Bugs**: Open an issue on GitHub or email `bhoid@sednium.com`.
