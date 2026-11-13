@@ -43,7 +43,8 @@ Safety Mode is enabled by default across both the CLI orchestrator and Chrome ex
 
 ## What It Does
 
-- **Works with any model selected in the web app**: You choose the model in the UI (like **Argon**, **GPT-6.1 Sol**, **GPT-6 Astra**, **Fable 5.5 / 5.1**, or **Claude Opus 5.5**), and the bridge uses it dynamically.
+- **Works with any model selected in the web app**: You choose the model in the UI (like **Gemini 4 Hydrogen**, **Argon**, **GPT-6.1 Sol**, **GPT-6 Astra**, **Fable 5.5 / 5.1**, or **Claude Opus 5.5**), and the bridge uses it dynamically.
+- **First-class Google Antigravity SDK & PWA support**: Use `LocalOpenAIAgentConfig` to run agentic loops powered by Gemini 4 Hydrogen in your standalone Gemini Chrome PWA or browser tab.
 - **Universal webchat support**: One Chrome extension works across `gemini.google.com`, `chatgpt.com`, and `claude.ai`.
 - **OpenAI-compatible server**: Drop `http://localhost:8765/v1` into Cursor, Antigravity, OpenClaude, Continue.dev, or the Python OpenAI SDK.
 - **Autonomous terminal loop**: Run commands and edits through the `gemini-bridge>` CLI with markdown tool blocks.
@@ -66,7 +67,7 @@ Safety Mode is enabled by default across both the CLI orchestrator and Chrome ex
 
 ```mermaid
 flowchart TD
-    Client[Cursor / Antigravity / Python SDK] -->|POST /v1/chat/completions| CLI[CLI Orchestrator :8765]
+    Client[Cursor / Google Antigravity / Python SDK] -->|POST /v1/chat/completions| CLI[CLI Orchestrator :8765]
     Terminal[Terminal User] -->|Prompt| CLI
 
     subgraph Phone [Phone System 1 via ADB :8000]
@@ -77,8 +78,8 @@ flowchart TD
     CLI <-->|Optional Check| Phone
     CLI <-->|WebSocket ws://localhost:8765| Ext[Chrome Extension content.js]
 
-    subgraph Browsers [Active Browser Tabs]
-        Gemini[Google Gemini]
+    subgraph Browsers [Active Visible Chrome Tab or PWA]
+        Gemini[Google Gemini / PWA (Gemini 4 Hydrogen)]
         ChatGPT[ChatGPT]
         Claude[Claude]
     end
@@ -196,6 +197,88 @@ response = client.chat.completions.create(
 )
 print(response.choices[0].message.content)
 ```
+
+---
+
+## Using Gemini 4 Hydrogen with Google Antigravity & PWAs
+
+Gemini Bridge provides first-class support for **Gemini 4 Hydrogen** and the **Google Antigravity SDK** (`google-antigravity`), allowing you to harness Google's frontier Hydrogen model for autonomous developer workflows straight from your personal web session or standalone Chrome Progressive Web App (PWA).
+
+### 1. Running Gemini 4 Hydrogen in the Gemini Chrome PWA
+
+For a distraction-free, dedicated agent environment, run Gemini as an installed Chrome PWA:
+
+1. In Google Chrome, navigate to [gemini.google.com](https://gemini.google.com).
+2. Install Gemini as a PWA:
+   - Click the **Install** icon in the Chrome address bar, or
+   - Click the three-dot menu (**⋮**) → **Save and share** → **Install page as app...** (or **Install Google Gemini**).
+3. In the standalone PWA window, select **Gemini 4 Hydrogen** from the model dropdown.
+4. The Gemini Bridge extension automatically attaches to the PWA window. The floating badge in the bottom-left updates to:
+   ```text
+   Agent Bridge: Ready [Gemini: Gemini 4 Hydrogen | Safe Mode]
+   ```
+5. Keep the PWA window open (or minimized to a secondary workspace) to maintain active session presence without headless automation flags.
+
+### 2. Connecting Google Antigravity via `LocalOpenAIAgentConfig`
+
+Google Antigravity connects directly to Gemini Bridge on `http://localhost:8765/v1` using its built-in `LocalOpenAIAgentConfig`.
+
+A complete, ready-to-run script is provided in [`examples/antigravity_agent.py`](examples/antigravity_agent.py).
+
+#### Prerequisites
+```bash
+pip install google-antigravity
+```
+
+#### Quick Integration Example
+```python
+import asyncio
+from google.antigravity import Agent
+from google.antigravity.connections.local.local_openai_connection_config import (
+    LocalOpenAIAgentConfig,
+)
+from google.antigravity.hooks import policy
+
+async def main():
+    # Connect Antigravity to Gemini Bridge running on localhost:8765
+    # The .lightweight() preset trims system prompts and scopes tools for webchat
+    config = (
+        LocalOpenAIAgentConfig(
+            model="gemini-4-hydrogen",
+            base_url="http://localhost:8765/v1",
+            api_key="gemini-bridge",
+            workspaces=["."],
+            policies=[policy.allow_all()],
+        )
+        .lightweight()
+    )
+
+    async with Agent(config) as agent:
+        response = await agent.chat("Analyze package.json and propose performance optimizations.")
+        async for token in response:
+            print(token, end="", flush=True)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### 3. Separation of Concerns: Antigravity Policies vs. PWA Inference
+
+When paired with Gemini Bridge, the system cleanly separates reasoning from local execution:
+
+- **Google Antigravity SDK (Local Host & Workspace):**
+  - Manages the agent loop, workspace isolation, and state machine.
+  - Enforces local file, shell, and security policies (e.g., `policy.allow_all()` or workspace root constraints).
+  - Executes local tools, reads files, and runs shell commands safely on your local machine.
+
+- **Gemini 4 Hydrogen in Gemini PWA (Inference Engine):**
+  - Handles reasoning, code comprehension, and tool call generation.
+  - Generates streaming responses with frontier Hydrogen reasoning capabilities.
+  - Leverages your authentic Google account session with zero headless browser markers or ban risk.
+
+- **Context Optimization via `.lightweight()`:**
+  - Calling `.lightweight()` on `LocalOpenAIAgentConfig` strips redundant system instruction bloat and focuses the tool catalog.
+  - This preserves webchat rolling context limits and ensures long multi-turn sessions remain fast and responsive.
 
 ---
 

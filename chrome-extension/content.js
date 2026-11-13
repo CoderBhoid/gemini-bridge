@@ -27,14 +27,66 @@
   const Adapters = {
     Gemini: {
       getModelName() {
-        const picker =
-          document.querySelector('button[data-test-id="model-selector-button"]') ||
-          document.querySelector('button[aria-label*="model" i]') ||
-          document.querySelector('.model-pill') ||
-          document.querySelector('button span.model-title');
-        if (picker) {
-          const text = (picker.innerText || picker.textContent || '').trim();
-          if (text) return text.split('\n')[0].trim();
+        const candidateSelectors = [
+          'button[data-test-id="model-selector-button"]',
+          'button[data-test-id="bard-mode-menu-button"]',
+          'button[aria-label*="Hydrogen" i]',
+          'button[aria-label*="Argon" i]',
+          'button[aria-label*="model" i]',
+          '[data-test-id*="model-selector"]',
+          '[data-test-id="selected-model-name"]',
+          '.model-pill',
+          'button span.model-title',
+          'bard-mode-switcher button',
+          'model-switcher button',
+          'header button[aria-haspopup="menu"]',
+          'nav button[aria-haspopup="menu"]',
+          '.mat-mdc-menu-trigger'
+        ];
+
+        for (const selector of candidateSelectors) {
+          const el = document.querySelector(selector);
+          if (el) {
+            const rawText = (el.innerText || el.textContent || el.getAttribute('aria-label') || '').trim();
+            if (/hydrogen/i.test(rawText)) {
+              return 'Gemini 4 Hydrogen';
+            }
+            if (/argon/i.test(rawText)) {
+              return 'Gemini 4 Argon';
+            }
+            if (rawText) {
+              const firstLine = rawText.split('\n')[0].trim();
+              if (firstLine && !/^(switch|select|choose|menu)/i.test(firstLine)) {
+                return firstLine;
+              }
+            }
+          }
+        }
+
+        // Header and top-bar inspection for Chrome PWA and standalone windows
+        const headerElements = document.querySelectorAll(
+          'header, [role="banner"], .top-bar, nav, bard-mode-switcher, bard-mode-menu, [data-test-id="top-bar"]'
+        );
+        for (const container of headerElements) {
+          const text = (container.innerText || container.textContent || '').trim();
+          if (/gemini\s*4\s*hydrogen|hydrogen/i.test(text)) {
+            return 'Gemini 4 Hydrogen';
+          }
+          if (/gemini\s*4\s*argon|argon/i.test(text)) {
+            return 'Gemini 4 Argon';
+          }
+        }
+
+        // Inspection across top-level buttons or chips in header
+        const topButtons = document.querySelectorAll('header button, nav button, [role="banner"] button, div[role="button"]');
+        for (const btn of topButtons) {
+          const label = (btn.getAttribute('aria-label') || btn.innerText || '').trim();
+          if (/hydrogen/i.test(label)) {
+            return 'Gemini 4 Hydrogen';
+          }
+          if (/argon/i.test(label)) {
+            return 'Gemini 4 Argon';
+          }
         }
         return 'Gemini Web';
       },
