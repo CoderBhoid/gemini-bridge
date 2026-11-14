@@ -301,6 +301,8 @@ function start() {
             { id: activeModel, object: 'model', created: now, owned_by: activePlatform.toLowerCase() },
             { id: 'gemini-4-hydrogen', object: 'model', created: now, owned_by: 'google' },
             { id: 'hydrogen', object: 'model', created: now, owned_by: 'google' },
+            { id: 'hydrogen-medium', object: 'model', created: now, owned_by: 'google' },
+            { id: 'gemini-4-hydrogen-medium', object: 'model', created: now, owned_by: 'google' },
             { id: 'gemini-hydrogen', object: 'model', created: now, owned_by: 'google' },
             { id: 'argon', object: 'model', created: now, owned_by: 'google' },
             { id: 'gemini-4-argon', object: 'model', created: now, owned_by: 'google' },

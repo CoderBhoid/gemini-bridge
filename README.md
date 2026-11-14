@@ -95,18 +95,25 @@ flowchart TD
 
 ## Quick Start
 
-### 🤖 One-Click Setup Prompt for Coding Agents (Cursor / Antigravity / Claude Code)
-If you use an AI coding assistant, paste this prompt into your agent to set up the safe, visible tab mode automatically:
+### 🤖 One-Click Setup Prompt for Coding Agents (Cursor / Antigravity / Claude Code / Windsurf)
+If you use an AI coding assistant, paste this prompt into your agent to set up the safe, visible tab mode and verify everything automatically:
 
 > **Copy-paste this prompt into your AI agent:**
 > ```text
-> Help me set up Gemini Bridge with maximum account safety (Visible Chrome Tab Mode):
+> Set up Gemini Bridge as my local OpenAI-compatible provider with maximum account safety:
 > 1. Clone https://github.com/CoderBhoid/gemini-bridge into my workspace and run `npm install`.
-> 2. Start the bridge service with safety mode (`npm start` or `node cli.js --safe`) listening on port 8765.
-> 3. Ask me which webchat interface I want to use (Google Gemini, ChatGPT, or Claude).
-> 4. Instruct me to load the unpacked extension from `chrome-extension/` in Chrome, open my chosen webchat tab, and pick ANY model I prefer in that webchat. Emphasize that for 100% account safety, I should keep the Chrome window open (it can sit on a secondary monitor or background workspace).
-> 5. Query `http://localhost:8765/v1/models` to dynamically detect the active model reported by my connected browser tab.
-> 6. Configure this workspace / agent to use base URL `http://localhost:8765/v1` with that detected model (or `gemini-web`), send a test completion to verify, and confirm when ready.
+> 2. Start the bridge service in the background with safety mode enabled: `npm start` (or `node cli.js --safe`) listening on port 8765.
+> 3. Ask me which webchat interface I want to use:
+>    - Google Gemini (Browser tab or installed Chrome PWA with Gemini 4 Hydrogen / Hydrogen Medium / Argon)
+>    - ChatGPT (chatgpt.com with GPT-6.1 Sol / GPT-6 Astra)
+>    - Claude (claude.ai with Claude Opus 5.5 / Sonnet)
+> 4. Instruct me to:
+>    - Load the unpacked extension from `chrome-extension/` in Chrome at `chrome://extensions`.
+>    - Open my chosen webchat or PWA, and pick ANY model I prefer in that interface.
+>    - Keep the browser/PWA window open (on a secondary monitor or background workspace) for 100% account safety and zero ban risk.
+> 5. Wait for me to open the interface, then query `http://localhost:8765/v1/models` to confirm the extension has attached (badge turns green: "● Agent Bridge: Ready") and detect the active model (e.g. `gemini-4-hydrogen` or `gemini-web`).
+> 6. Configure this agent / workspace to use base URL `http://localhost:8765/v1` (API key: `gemini-bridge`), send a test completion to verify, and confirm when ready.
+> 7. (Optional - For Google Antigravity users): Install the `/hydrogen` slash command by copying `skills/hydrogen` to `~/.gemini/config/skills/hydrogen` so I can query Hydrogen on demand anytime with `/hydrogen <prompt>`.
 > ```
 
 ---
@@ -279,6 +286,21 @@ When paired with Gemini Bridge, the system cleanly separates reasoning from loca
 - **Context Optimization via `.lightweight()`:**
   - Calling `.lightweight()` on `LocalOpenAIAgentConfig` strips redundant system instruction bloat and focuses the tool catalog.
   - This preserves webchat rolling context limits and ensures long multi-turn sessions remain fast and responsive.
+
+### 4. Interactive Antigravity Slash Command (`/hydrogen`)
+
+Gemini Bridge includes a pre-built Antigravity skill in `skills/hydrogen/` that gives you a native `/hydrogen` slash command inside the Antigravity chat window:
+
+1. Install the skill:
+   ```bash
+   mkdir -p ~/.gemini/config/skills/hydrogen
+   cp -r skills/hydrogen/* ~/.gemini/config/skills/hydrogen/
+   ```
+2. In your Antigravity chat canvas, type:
+   ```text
+   /hydrogen what's the cleanest way to implement this in Rust?
+   ```
+3. Antigravity will route your query to your active Gemini PWA, retrieve Hydrogen's response, and display it directly in the chat window.
 
 ---
 
