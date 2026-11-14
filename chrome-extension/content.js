@@ -27,14 +27,16 @@
   const Adapters = {
     Gemini: {
       getModelName() {
-        // 1. Direct search for any button or label showing Hydrogen or Argon in the input container or header
+        // 1. Direct search for any button or label showing Hydrogen (Low/Medium/High) or Argon in the input container or header
         const allButtonsAndChips = document.querySelectorAll(
           'button, [role="button"], span.model-title, [data-test-id*="model"], .mat-mdc-menu-trigger'
         );
         for (const el of allButtonsAndChips) {
           const text = (el.innerText || el.textContent || el.getAttribute('aria-label') || '').trim();
-          if (/hydrogen\s*medium/i.test(text)) {
-            return 'Hydrogen Medium';
+          if (/hydrogen\s*(low|medium|high)/i.test(text)) {
+            const match = text.match(/hydrogen\s*(low|medium|high)/i);
+            const level = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
+            return `Hydrogen ${level}`;
           }
           if (/hydrogen/i.test(text) && text.length < 35) {
             return text.split('\n')[0].trim() || 'Gemini 4 Hydrogen';

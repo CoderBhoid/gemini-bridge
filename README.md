@@ -43,7 +43,7 @@ Safety Mode is enabled by default across both the CLI orchestrator and Chrome ex
 
 ## What It Does
 
-- **Works with any model selected in the web app**: You choose the model in the UI (like **Gemini 4 Hydrogen**, **Argon**, **GPT-6.1 Sol**, **GPT-6 Astra**, **Fable 5.5 / 5.1**, or **Claude Opus 5.5**), and the bridge uses it dynamically.
+- **Works with any model selected in the web app**: You choose the model in the UI (like **Gemini 4 Hydrogen (Low / Medium / High)**, **Argon**, **GPT-6.1 Sol**, **GPT-6 Astra**, **Fable 5.5 / 5.1**, or **Claude Opus 5.5**), and the bridge uses it dynamically.
 - **First-class Google Antigravity SDK & PWA support**: Use `LocalOpenAIAgentConfig` to run agentic loops powered by Gemini 4 Hydrogen in your standalone Gemini Chrome PWA or browser tab.
 - **Universal webchat support**: One Chrome extension works across `gemini.google.com`, `chatgpt.com`, and `claude.ai`.
 - **OpenAI-compatible server**: Drop `http://localhost:8765/v1` into Cursor, Antigravity, OpenClaude, Continue.dev, or the Python OpenAI SDK.
@@ -104,7 +104,7 @@ If you use an AI coding assistant, paste this prompt into your agent to set up t
 > 1. Clone https://github.com/CoderBhoid/gemini-bridge into my workspace and run `npm install`.
 > 2. Start the bridge service in the background with safety mode enabled: `npm start` (or `node cli.js --safe`) listening on port 8765.
 > 3. Ask me which webchat interface I want to use:
->    - Google Gemini (Browser tab or installed Chrome PWA with Gemini 4 Hydrogen / Hydrogen Medium / Argon)
+>    - Google Gemini (Browser tab or installed Chrome PWA with Gemini 4 Hydrogen Low / Medium / High, or Argon)
 >    - ChatGPT (chatgpt.com with GPT-6.1 Sol / GPT-6 Astra)
 >    - Claude (claude.ai with Claude Opus 5.5 / Sonnet)
 > 4. Instruct me to:
@@ -219,10 +219,10 @@ For a distraction-free, dedicated agent environment, run Gemini as an installed 
 2. Install Gemini as a PWA:
    - Click the **Install** icon in the Chrome address bar, or
    - Click the three-dot menu (**⋮**) → **Save and share** → **Install page as app...** (or **Install Google Gemini**).
-3. In the standalone PWA window, select **Gemini 4 Hydrogen** from the model dropdown.
+3. In the standalone PWA window, select **Gemini 4 Hydrogen** (choose between **Hydrogen Low**, **Hydrogen Medium**, or **Hydrogen High** depending on your reasoning depth requirement).
 4. The Gemini Bridge extension automatically attaches to the PWA window. The floating badge in the bottom-left updates to:
    ```text
-   Agent Bridge: Ready [Gemini: Gemini 4 Hydrogen | Safe Mode]
+   Agent Bridge: Ready [Gemini: Hydrogen Medium | Safe Mode]
    ```
 5. Keep the PWA window open (or minimized to a secondary workspace) to maintain active session presence without headless automation flags.
 
